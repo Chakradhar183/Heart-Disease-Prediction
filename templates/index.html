@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Heart Disease Predictor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { 
+      max-width: 900px; 
+      margin: 0 auto; 
+      padding: 30px; 
+      background: #fff; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 { 
+      color: #e53935; 
+      margin-bottom: 10px;
+      font-size: 2em;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 0.95em;
+    }
+    .error-message { 
+      background: #ffebee; 
+      color: #c62828; 
+      padding: 15px; 
+      border-radius: 8px; 
+      margin-bottom: 20px;
+      border-left: 4px solid #e53935;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-weight: 600;
+      color: #444;
+      font-size: 0.9em;
+    }
+    input[type=number], select { 
+      padding: 12px; 
+      border-radius: 8px; 
+      border: 2px solid #e0e0e0; 
+      font-size: 1em;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input[type=number]:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .predict-btn { 
+      background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+      color: #fff; 
+      padding: 16px 32px; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      width: 100%;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .predict-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+    }
+    .predict-btn:active {
+      transform: translateY(0);
+    }
+    .section-title {
+      color: #667eea;
+      font-size: 1.2em;
+      margin: 25px 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>❤️ Heart Disease Risk Predictor</h1>
+      <p class="subtitle">Enter patient information to predict heart disease risk using machine learning</p>
+    </header>
+
+    {% if error %}
+      <div class="error-message">
+        <strong>⚠️ Error:</strong> {{ error }}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="/predict" novalidate>
+      
+      <div class="section-title">📊 Physical Measurements</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="BMI">BMI (Body Mass Index)</label>
+          <input type="number" id="BMI" name="BMI" step="0.1" min="10" max="60" placeholder="e.g., 27.4" required/>
+        </div>
+
+        <div class="form-group">
+          <label for="PhysicalHealth">Physical Health (poor days/month)</label>
+          <input type="number" id="PhysicalHealth" name="PhysicalHealth" min="0" max="30" step="1" placeholder="0-30 days" required/>
+        </div>
+
+        <div class="form-group">
+          <label for="MentalHealth">Mental Health (poor days/month)</label>
+          <input type="number" id="MentalHealth" name="MentalHealth" min="0" max="30" step="1" placeholder="0-30 days" required/>
+        </div>
+
+        <div class="form-group">
+          <label for="SleepTime">Average Sleep Time (hours/day)</label>
+          <input type="number" id="SleepTime" name="SleepTime" step="0.5" min="0" max="24" placeholder="e.g., 7" required/>
+        </div>
+      </div>
+
+      <div class="section-title">👤 Demographics</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="AgeCategory">Age Category</label>
+          <select id="AgeCategory" name="AgeCategory" required>
+            <option value="">-- Select Age --</option>
+            <option value="0">18-24</option>
+            <option value="1">25-29</option>
+            <option value="2">30-34</option>
+            <option value="3">35-39</option>
+            <option value="4">40-44</option>
+            <option value="5">45-49</option>
+            <option value="6">50-54</option>
+            <option value="7">55-59</option>
+            <option value="8">60-64</option>
+            <option value="9">65-69</option>
+            <option value="10">70-74</option>
+            <option value="11">75-79</option>
+            <option value="12">80 or older</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Sex">Sex</label>
+          <select id="Sex" name="Sex" required>
+            <option value="">-- Select Sex --</option>
+            <option value="0">Female</option>
+            <option value="1">Male</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Race">Race / Ethnicity</label>
+          <select id="Race" name="Race" required>
+            <option value="">-- Select Race --</option>
+            <option value="0">American Indian/Alaskan Native</option>
+            <option value="1">Asian</option>
+            <option value="2">Black</option>
+            <option value="3">Hispanic</option>
+            <option value="4">Other</option>
+            <option value="5">White</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">🏥 Health Status</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="GenHealth">General Health</label>
+          <select id="GenHealth" name="GenHealth" required>
+            <option value="">-- Select --</option>
+            <option value="0">Excellent</option>
+            <option value="1">Fair</option>
+            <option value="2">Good</option>
+            <option value="3">Poor</option>
+            <option value="4">Very good</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Diabetic">Diabetic Status</label>
+          <select id="Diabetic" name="Diabetic" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">No, borderline diabetes</option>
+            <option value="2">Yes</option>
+            <option value="3">Yes (during pregnancy)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Asthma">Asthma</label>
+          <select id="Asthma" name="Asthma" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="KidneyDisease">Kidney Disease</label>
+          <select id="KidneyDisease" name="KidneyDisease" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="SkinCancer">Skin Cancer</label>
+          <select id="SkinCancer" name="SkinCancer" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">🚶 Lifestyle & Risk Factors</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="Smoking">Smoking</label>
+          <select id="Smoking" name="Smoking" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="AlcoholDrinking">Heavy Alcohol Drinking</label>
+          <select id="AlcoholDrinking" name="AlcoholDrinking" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="PhysicalActivity">Physical Activity (past month)</label>
+          <select id="PhysicalActivity" name="PhysicalActivity" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="DiffWalking">Difficulty Walking</label>
+          <select id="DiffWalking" name="DiffWalking" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Stroke">History of Stroke</label>
+          <select id="Stroke" name="Stroke" required>
+            <option value="">-- Select --</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="predict-btn">🔍 Predict Heart Disease Risk</button>
+    </form>
+  </div>
+</body>
+</html>

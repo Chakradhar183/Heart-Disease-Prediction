@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Prediction Result</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f6f7fb;color:#222}
+    .container{max-width:900px;margin:30px auto;padding:18px}
+    .result-card{border-radius:10px;padding:18px;box-shadow:0 4px 18px rgba(0,0,0,0.06)}
+    .risk{border-left:6px solid #d32f2f;background:#fff6f6}
+    .safe{border-left:6px solid #2e7d32;background:#f6fff6}
+    .features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+    .feature-item{background:#fff;padding:10px;border-radius:8px;border:1px solid #eee}
+    .feature-name{font-weight:700;display:block;margin-bottom:6px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔍 Prediction Result</h1>
+      <a href="/">← Make Another Prediction</a>
+    </header>
+
+    <div class="result-card {% if 'Detected' in prediction or 'risk' in prediction|lower %}risk{% else %}safe{% endif %}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2>{{ prediction }}</h2>
+        <div>Confidence: {{ confidence }}%</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <h3>Input Summary</h3>
+        <div class="features-grid">
+          {% for key, val in features.items() %}
+            <div class="feature-item">
+              <span class="feature-name">{{ key }}</span>
+              <span class="feature-value">{{ val }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if 'Detected' in prediction or 'risk' in prediction|lower %}
+        <div style="margin-top:14px;padding:12px;border-radius:8px;background:#fff0f0;border:1px solid #ffd3d3">
+          <h3>⚠️ Recommendation</h3>
+          <p>Please consult a healthcare professional for proper evaluation and guidance.</p>
+        </div>
+      {% else %}
+        <div style="margin-top:14px;padding:12px;border-radius:8px;background:#f0fff6;border:1px solid #d9f4e0">
+          <h3>✅ Recommendation</h3>
+          <p>Maintain a healthy lifestyle, regular check-ups and balanced diet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
